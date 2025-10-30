@@ -112,7 +112,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
           'Galería de Imágenes',

@@ -90,7 +90,7 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero, // Esquinas completamente rectas
@@ -140,7 +140,7 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 1), // Índice 1 para "Conexión"
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 2), // Device
     );
   }
 }

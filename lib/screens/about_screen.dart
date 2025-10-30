@@ -8,7 +8,7 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
           'Acerca de',
@@ -34,7 +34,7 @@ class AboutScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 2),
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 1), // Info
     );
   }
 

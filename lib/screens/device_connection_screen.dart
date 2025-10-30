@@ -19,7 +19,7 @@ class _DeviceConnectionScreenState extends State<DeviceConnectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -52,7 +52,7 @@ class _DeviceConnectionScreenState extends State<DeviceConnectionScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 1),
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 2),
     );
   }
 

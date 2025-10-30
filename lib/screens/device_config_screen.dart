@@ -39,7 +39,7 @@ class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
     return Scaffold(
       backgroundColor: Colors.white, // Fondo blanco
       appBar: AppBar(
-        backgroundColor: Colors.white, // AppBar blanco
+        backgroundColor: Colors.transparent, // AppBar transparente
         elevation: 0,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero, // Esquinas completamente rectas
