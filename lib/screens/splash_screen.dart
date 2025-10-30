@@ -21,8 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    // SIEMPRE pedimos IP (como me pediste)
-    context.go('/ip');
+    // Navegar a la pantalla de bienvenida
+    context.go('/');
   }
 
   @override

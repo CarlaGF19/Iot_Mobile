@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class IpScreen extends StatefulWidget {
-  const IpScreen({super.key});
+class DeviceConfigScreen extends StatefulWidget {
+  const DeviceConfigScreen({super.key});
 
   @override
-  State<IpScreen> createState() => _IpScreenState();
+  State<DeviceConfigScreen> createState() => _DeviceConfigScreenState();
 }
 
-class _IpScreenState extends State<IpScreen> {
+class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
   final TextEditingController _ipController = TextEditingController();
 
   @override
@@ -31,7 +31,7 @@ class _IpScreenState extends State<IpScreen> {
     await prefs.setString("esp32_ip", ip);
 
     if (!mounted) return;
-    context.go('/home', extra: ip);
+    context.go('/main-menu');
   }
 
   @override
@@ -59,6 +59,18 @@ class _IpScreenState extends State<IpScreen> {
               label: const Text("Guardar y continuar"),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        mini: true,
+        backgroundColor: Colors.blue,
+        onPressed: () {
+          context.go('/main-menu');
+        },
+        child: const Icon(
+          Icons.arrow_forward,
+          size: 20,
+          color: Colors.white,
         ),
       ),
     );

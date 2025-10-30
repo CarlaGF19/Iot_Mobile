@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sensor_detail_page.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class SensorDashboardScreen extends StatefulWidget {
+  final String ip;
+  
+  const SensorDashboardScreen({super.key, required this.ip});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<SensorDashboardScreen> createState() => _SensorDashboardScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
   String? esp32Ip;
 
   @override
   void initState() {
     super.initState();
+    esp32Ip = widget.ip.isNotEmpty ? widget.ip : null;
     _loadIp();
   }
 
@@ -26,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _setIpDialog() async {
-    final TextEditingController controller = TextEditingController(text: esp32Ip ?? "");
+    final TextEditingController controller = TextEditingController(
+      text: esp32Ip ?? "",
+    );
 
     await showDialog(
       context: context,
@@ -73,11 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SensorDetailPage(
-          esp32Ip: esp32Ip!,
-          tipo: tipo,
-          titulo: titulo,
-        ),
+        builder: (_) =>
+            SensorDetailPage(esp32Ip: esp32Ip!, tipo: tipo, titulo: titulo),
       ),
     );
   }
@@ -88,10 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("Sensores del ESP32"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: _setIpDialog,
-          ),
+          IconButton(icon: const Icon(Icons.settings), onPressed: _setIpDialog),
         ],
       ),
       body: Padding(
