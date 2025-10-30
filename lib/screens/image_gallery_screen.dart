@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'image_detail_screen.dart';
 import '../models/image_data.dart';
+import '../widgets/bottom_navigation_widget.dart';
 
 class ImageGalleryScreen extends StatefulWidget {
   const ImageGalleryScreen({super.key});
@@ -278,6 +279,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
             : const Icon(Icons.camera_alt),
         label: Text(isCapturing ? 'Capturando...' : 'Capturar'),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 0), // Índice 0 para "Home"
     );
   }
 

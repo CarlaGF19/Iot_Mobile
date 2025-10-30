@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'sensor_detail_page.dart';
+import '../widgets/bottom_navigation_widget.dart';
 
 class SensorDashboardScreen extends StatefulWidget {
   final String ip;
@@ -139,6 +140,7 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 1), // Índice 1 para "Conexión"
     );
   }
 }
