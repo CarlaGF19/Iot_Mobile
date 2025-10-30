@@ -22,7 +22,8 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   bool _imageLoaded = false;
   bool _imageExists = false;
   bool _isDisposed = false; // Añadido para evitar setState después de dispose
-  bool _isDataFetching = false; // Añadido para evitar múltiples llamadas simultáneas
+  bool _isDataFetching =
+      false; // Añadido para evitar múltiples llamadas simultáneas
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       _loadIpAndFetchData();
       _preloadImageAsync();
     });
-    
+
     // Optimización: Reducir frecuencia del timer de 10s a 15s para mejor rendimiento
     _dataTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
       if (!_isDisposed && mounted) {
@@ -51,7 +52,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   // Optimización: Precarga de imagen asíncrona para no bloquear la UI inicial
   Future<void> _preloadImageAsync() async {
     if (_isDisposed) return;
-    
+
     try {
       await precacheImage(
         const AssetImage('assets/images/img_main_menu_screen.jpg'),
@@ -77,7 +78,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   Future<void> _fetchSensorDataWithDebounce() async {
     if (_isDataFetching || _isDisposed) return;
     _isDataFetching = true;
-    
+
     try {
       await _fetchSensorData();
     } finally {
@@ -87,7 +88,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
   Future<void> _loadIpAndFetchData() async {
     if (_isDisposed) return;
-    
+
     final prefs = await SharedPreferences.getInstance();
     _esp32Ip = prefs.getString("esp32_ip") ?? "";
     await _fetchSensorDataWithDebounce();
@@ -95,7 +96,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
   Future<void> _fetchSensorData() async {
     if (_isDisposed || !mounted) return;
-    
+
     if (_esp32Ip.isEmpty) {
       if (mounted) {
         setState(() {
@@ -147,29 +148,35 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
         255,
         255,
       ), // Verde muy claro de fondo
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Imagen decorativa
-                _buildHeaderImage(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen decorativa que cubre todo el header
+          _buildHeaderImage(),
 
-                const SizedBox(height: 20),
+          // Contenido con padding en un Expanded para ocupar el resto del espacio
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
 
-                // Módulo introductorio
-                _buildIntroductoryModule(),
+                    // Módulo introductorio
+                    _buildIntroductoryModule(),
 
-                const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                // Accesos Rápidos
-                _buildQuickAccess(),
-              ],
+                    // Accesos Rápidos
+                    _buildQuickAccess(),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: const BottomNavigationWidget(currentIndex: 0),
     );
@@ -231,66 +238,88 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   }
 
   Widget _buildQuickAccess() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardPadding = (screenWidth * 0.04).clamp(16.0, 20.0);
+    double buttonSpacing = (screenWidth * 0.015).clamp(10.0, 12.0);
+    
     return Card(
-      elevation: 4,
+      elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.flash_on,
-                  color: Color(0xFF498428),
-                  size: 24,
-                ), // Verde oscuro
-                const SizedBox(width: 8),
-                const Text(
-                  'Accesos Rápidos',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildQuickAccessButton(
-                    'Sensores',
-                    Icons.dashboard,
-                    const Color(0xFF80B155), // Verde medio
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SensorDashboardScreen(ip: _esp32Ip),
-                        ),
-                      );
-                    },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF98C98D).withOpacity(0.4), // Efecto glass
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFFCEE2BE).withOpacity(0.6),
+            width: 1,
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(cardPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.flash_on,
+                    color: Color(0xFF00444D), // Color principal de la paleta
+                    size: 24,
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildQuickAccessButton(
-                    'Galería',
-                    Icons.photo_library,
-                    const Color(0xFFC1D95C), // Verde lima
-                    () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ImageGalleryScreen(),
-                        ),
-                      );
-                    },
+                  SizedBox(width: buttonSpacing * 0.8),
+                  const Text(
+                    'Accesos Rápidos',
+                    style: TextStyle(
+                      fontSize: 18, 
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF00444D), // Color principal de la paleta
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              SizedBox(height: cardPadding * 0.8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    flex: 1,
+                    child: _buildQuickAccessButton(
+                      'Sensores',
+                      Icons.dashboard,
+                      const Color(0xFF63B069), // Verde medio de la paleta
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SensorDashboardScreen(ip: _esp32Ip),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(width: buttonSpacing),
+                  Flexible(
+                    flex: 1,
+                    child: _buildQuickAccessButton(
+                      'Galería',
+                      Icons.photo_library,
+                      const Color(0xFF247E5A), // Verde oscuro de la paleta
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ImageGalleryScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -334,11 +363,15 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   }
 
   Widget _buildHeaderImage() {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Container(
       width: double.infinity,
-      height: 200,
+      height: screenHeight * 0.35, // 35% de la altura de la pantalla
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -349,7 +382,10 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
         child: _buildImageContent(),
       ),
     );
@@ -360,7 +396,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     if (!_imageLoaded) {
       return _buildDefaultBackground();
     }
-    
+
     // Si la imagen existe y está cargada, la muestra
     if (_imageExists) {
       return Image.asset(
