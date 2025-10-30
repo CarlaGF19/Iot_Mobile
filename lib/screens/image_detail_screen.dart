@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'image_gallery_screen.dart';
+import '../models/image_data.dart';
 
 class ImageDetailScreen extends StatefulWidget {
   final ImageData image;
@@ -164,26 +164,26 @@ class _ImageDetailScreenState extends State<ImageDetailScreen> {
       extendBodyBehindAppBar: true,
       appBar: _showAppBar
           ? AppBar(
-              backgroundColor: Colors.black.withValues(alpha: 0.7),
+              backgroundColor: Colors.white.withValues(alpha: 0.9),
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back, color: Color(0xFF498428)), // Verde oscuro
                 onPressed: () => Navigator.pop(context),
               ),
               title: Text(
                 'Imagen ${widget.image.id}',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF498428), // Verde oscuro para el texto
                   fontWeight: FontWeight.w600,
                 ),
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.info_outline, color: Colors.white),
+                  icon: const Icon(Icons.info_outline, color: Color(0xFF498428)), // Verde oscuro
                   onPressed: _showImageInfo,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.zoom_out_map, color: Colors.white),
+                  icon: const Icon(Icons.zoom_out_map, color: Color(0xFF498428)), // Verde oscuro
                   onPressed: _resetZoom,
                 ),
               ],

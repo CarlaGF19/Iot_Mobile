@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/welcome_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/device_config_screen.dart';
 import 'screens/main_menu_screen.dart';
 import 'screens/sensor_dashboard_screen.dart';
+import 'screens/sensor_detail_page.dart';
 import 'screens/image_gallery_screen.dart';
 import 'screens/image_detail_screen.dart';
-import 'screens/sensor_detail_page.dart';
-import 'screens/splash_screen.dart';
+import 'screens/device_connection_screen.dart';
+import 'screens/about_screen.dart';
+import 'models/image_data.dart';
 
 void main() {
   runApp(const MainApp());
@@ -60,6 +63,14 @@ final GoRouter _router = GoRouter(
         final image = state.extra as ImageData;
         return ImageDetailScreen(image: image);
       },
+    ),
+    GoRoute(
+      path: '/device-connection',
+      builder: (context, state) => const DeviceConnectionScreen(),
+    ),
+    GoRoute(
+      path: '/about',
+      builder: (context, state) => const AboutScreen(),
     ),
   ],
 );

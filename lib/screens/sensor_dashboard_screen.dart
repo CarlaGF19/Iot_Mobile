@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'sensor_detail_page.dart';
 
 class SensorDashboardScreen extends StatefulWidget {
@@ -88,9 +89,24 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sensores del ESP32"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero, // Esquinas completamente rectas
+        ),
+        title: Text(
+          "IoT Monitor",
+          style: TextStyle(
+            color: const Color(0xFF498428), // Verde oscuro para el texto
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.settings), onPressed: _setIpDialog),
+          IconButton(
+            icon: const Icon(Icons.settings, color: Color(0xFF498428)), // Verde oscuro para el ícono
+            onPressed: _setIpDialog,
+          ),
         ],
       ),
       body: Padding(

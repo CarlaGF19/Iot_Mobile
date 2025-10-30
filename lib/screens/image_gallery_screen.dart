@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'image_detail_screen.dart';
+import '../models/image_data.dart';
 
 class ImageGalleryScreen extends StatefulWidget {
   const ImageGalleryScreen({super.key});
@@ -110,22 +111,22 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
         title: const Text(
           'Galería de Imágenes',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Color(0xFF498428), // Verde oscuro para el texto
           ),
         ),
-        backgroundColor: Colors.purple,
-        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF498428)), // Verde oscuro para el ícono
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: const Icon(Icons.refresh, color: Color(0xFF498428)), // Verde oscuro
             onPressed: _loadImages,
           ),
         ],
@@ -367,16 +368,4 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
       return 'Ahora';
     }
   }
-}
-
-class ImageData {
-  final String id;
-  final DateTime timestamp;
-  final String size;
-
-  ImageData({
-    required this.id,
-    required this.timestamp,
-    required this.size,
-  });
 }
