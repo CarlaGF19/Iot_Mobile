@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'sensor_detail_page.dart';
@@ -89,26 +90,25 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero, // Esquinas completamente rectas
-        ),
-        title: Text(
-          "IoT Monitor",
+        backgroundColor: Colors.white,
+        elevation: 2,
+        title: const Text(
+          'Sensores',
           style: TextStyle(
-            color: const Color(0xFF498428), // Verde oscuro para el texto
+            color: Color(0xFF009E73),
             fontWeight: FontWeight.w600,
-            fontSize: 20,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFF498428)), // Verde oscuro para el ícono
-            onPressed: _setIpDialog,
-          ),
-        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF00E0A6)),
+          onPressed: () {
+            // Usar pop para evitar conflictos con Navigator.push desde MainMenu
+            Navigator.pop(context);
+          },
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF00E0A6)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -140,7 +140,8 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 2), // Device
+      // Mantener el BottomNavigation, resaltando Home para coherencia
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 0),
     );
   }
 }
@@ -163,8 +164,16 @@ class SensorCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 64, 95, 65),
+          color: const Color(0xFFE6FFF5),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF009E73), width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(0, 160, 120, 0.15),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -174,17 +183,17 @@ class SensorCard extends StatelessWidget {
               Text(
                 titulo,
                 style: const TextStyle(
-                  color: Color(0xFFDDDDDD),
+                  color: Color(0xFF009E73),
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              Icon(icono, color: Color(0xFFDDDDDD), size: 36),
+              Icon(icono, color: Color(0xFF00E0A6), size: 36),
               const SizedBox(height: 10),
               const Text(
                 "Ver detalles",
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: Color(0xFF009E73)),
               ),
             ],
           ),
