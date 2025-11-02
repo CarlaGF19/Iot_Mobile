@@ -25,3 +25,9 @@ flutter:
   
   assets:
     - assets/images/
+    - assets/icons/
+    # Registro explícito de imágenes usadas en el Sensor Dashboard
+    - assets/images/sensor_dashboard/s_temp.png
+    - assets/images/sensor_dashboard/s_humedad.png
+    - assets/images/sensor_dashboard/s_ph.png
+    - assets/images/sensor_dashboard/s_tds.png
