@@ -1,155 +1,177 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../widgets/bottom_navigation_widget.dart';
-import '../constants/app_colors.dart';
+import '../constants/strings.dart';
 
-// Tipografías estándar
-const TextStyle _appBarTitleStyle = TextStyle(
-  color: AppColors.deepGreen,
-  fontWeight: FontWeight.w600,
-);
+// Tipografías se tomarán del Theme para mantener consistencia
 
-const TextStyle _screenTitleStyle = TextStyle(
-  fontSize: 24,
-  fontWeight: FontWeight.bold,
-  color: AppColors.deepGreen,
-);
-
-const TextStyle _sectionTitleStyle = TextStyle(
-  fontSize: 18,
-  fontWeight: FontWeight.bold,
-  color: AppColors.deepGreen,
-);
-
-const TextStyle _bodyTextStyle = TextStyle(
-  fontSize: 14,
-  height: 1.5,
-  color: AppColors.deepGreen,
-);
-
-const TextStyle _labelTextStyle = TextStyle(
-  fontSize: 14,
-  fontWeight: FontWeight.bold,
-  color: AppColors.deepGreen,
-);
-
-class AboutScreen extends StatelessWidget {
+class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
   @override
+  State<AboutScreen> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScreen> {
+  bool _visible = false;
+
+  // Paleta corporativa EcoGrid
+  static const Color ecoPrimary = Color(0xFF00E0A6); // Verde principal
+  static const Color ecoSecondary = Color(0xFF6AD48A); // Verde secundario
+  static const Color ecoCyan = Color(0xFF00FFCC); // Cian brillante
+  static const Color ecoDark = Color(0xFF004C3F); // Verde oscuro base
+  static const Color ecoWhite = Color(0xFFF7FFF9); // Blanco perlado
+
+  // Versión del Flutter SDK utilizada (capturada del entorno de desarrollo)
+  static const String flutterSdkVersion = '3.35.7';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _visible = true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        title: const Text('Acerca de'),
+        backgroundColor: const Color.fromRGBO(247, 255, 249, 1),
+        foregroundColor: const Color.fromARGB(255, 5, 145, 40),
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: ecoDark,
+          statusBarIconBrightness: Brightness.light,
+        ),
         elevation: 0,
-        title: const Text('Acerca de', style: _appBarTitleStyle),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildProjectHeader(),
-            const SizedBox(height: 20),
-            _buildProjectDescription(),
-            const SizedBox(height: 20),
-            _buildTechnicalSpecs(),
-            const SizedBox(height: 20),
-            _buildFeatures(),
-            const SizedBox(height: 20),
-            _buildTeamInfo(),
-            const SizedBox(height: 20),
-            _buildVersionInfo(),
-          ],
+      backgroundColor: ecoWhite,
+      body: AnimatedOpacity(
+        opacity: _visible ? 1 : 0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 900;
+            final horizontalPadding = isWide ? 24.0 : 16.0;
+            return SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: 16,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 840),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 16),
+                      _buildProjectDescription(),
+                      const SizedBox(height: 16),
+                      _buildTechnicalSpecs(),
+                      const SizedBox(height: 16),
+                      _buildFeatures(theme),
+                      const SizedBox(height: 16),
+                      _buildVersionInfo(),
+                      const SizedBox(height: 16),
+                      _buildCopyrightLicense(),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
-      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 1), // Info
+      bottomNavigationBar: const BottomNavigationWidget(currentIndex: 1),
     );
   }
 
-  Widget _buildProjectHeader() {
-    return Card(
-      color: AppColors.mintSurface,
-      shadowColor: AppColors.shadowMint20,
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.mintAccent,
-                    AppColors.tealAccent,
-                  ],
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: AppColors.shadowMint25,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.sensors,
-                size: 40,
-                color: Colors.white,
-              ),
+  Widget _buildHeader() {
+    final theme = Theme.of(context);
+    return Container(
+      key: const Key('about_header'),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      decoration: BoxDecoration(
+        color: ecoWhite,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: ecoPrimary.withOpacity(0.10),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 72,
+            child: Image.asset(
+              'assets/icons/ecogrid_g.png',
+              fit: BoxFit.contain,
             ),
-            const SizedBox(height: 16),
-            const Text('IoT Monitor App', style: _screenTitleStyle),
-            const SizedBox(height: 8),
-            Text(
-              'Sistema de Monitoreo IoT con ESP32',
-              style: TextStyle(fontSize: 16, color: AppColors.deepGreen.withOpacity(0.75)),
-              textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          // Nombre correcto de la aplicación
+          const Text(
+            'EcoGrid',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: ecoDark,
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            Strings.headerTitle,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: ecoPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildProjectDescription() {
+    final theme = Theme.of(context);
     return Card(
-      color: AppColors.mintSurface,
-      shadowColor: AppColors.shadowMint20,
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      key: const Key('about_description'),
+      color: const Color.fromRGBO(247, 255, 249, 1),
+      elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.description, color: AppColors.secondaryGreen),
+                const Icon(Icons.description, color: ecoCyan),
                 const SizedBox(width: 8),
-                const Text('Descripción del Proyecto', style: _sectionTitleStyle),
+                Text(
+                  Strings.projectDescriptionTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: ecoDark,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Esta aplicación móvil permite monitorear en tiempo real sensores IoT conectados a un microcontrolador ESP32. '
-              'El sistema recopila datos de temperatura, humedad, pH y TDS (sólidos disueltos totales), '
-              'proporcionando una interfaz intuitiva para visualizar y analizar la información.',
-              style: _bodyTextStyle,
-            ),
-            const SizedBox(height: 12),
-            const Text('Características principales:', style: _labelTextStyle),
             const SizedBox(height: 8),
-            _buildFeatureItem('📊', 'Monitoreo en tiempo real'),
-            _buildFeatureItem('📱', 'Interfaz móvil intuitiva'),
-            _buildFeatureItem('🌐', 'Conectividad WiFi'),
-            _buildFeatureItem('📸', 'Galería de imágenes'),
-            _buildFeatureItem('⚙️', 'Configuración de dispositivos'),
+            Text(
+              Strings.projectDescriptionBody,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: ecoDark,
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),
@@ -157,42 +179,78 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildTechnicalSpecs() {
+    final theme = Theme.of(context);
+    final specs = [
+      (
+        icon: Icons.developer_board,
+        title: Strings.microcontrollerLabel,
+        subtitle: Strings.microcontrollerValue,
+      ),
+      (
+        icon: Icons.wifi,
+        title: Strings.connectivityLabel,
+        subtitle: Strings.connectivityValue,
+      ),
+      (
+        icon: Icons.sensors,
+        title: Strings.sensorsLabel,
+        subtitle: Strings.sensorsValue,
+      ),
+      (
+        icon: Icons.http,
+        title: Strings.protocolLabel,
+        subtitle: Strings.protocolValue,
+      ),
+      (
+        icon: Icons.phone_android,
+        title: Strings.mobilePlatformLabel,
+        subtitle: Strings.mobilePlatformValue,
+      ),
+      (
+        icon: Icons.alt_route,
+        title: Strings.architectureLabel,
+        subtitle: Strings.architectureValue,
+      ),
+    ];
+
     return Card(
-      color: AppColors.mintSurface,
-      shadowColor: AppColors.shadowMint20,
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      key: const Key('about_specs'),
+      color: ecoWhite,
+      elevation: 1,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.memory, color: AppColors.secondaryGreen),
-                const SizedBox(width: 8),
-                const Text('Especificaciones Técnicas', style: _sectionTitleStyle),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildSpecItem('Microcontrolador', 'ESP32'),
-            _buildSpecItem('Conectividad', 'WiFi 802.11 b/g/n'),
-            _buildSpecItem('Sensores', 'Temperatura, Humedad, pH, TDS'),
-            _buildSpecItem('Protocolo', 'HTTP/TCP'),
-            _buildSpecItem('Plataforma Móvil', 'Flutter (Android/iOS)'),
-            _buildSpecItem('Arquitectura', 'GoRouter + Material Design'),
-          ],
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: specs.length,
+          itemBuilder: (context, index) {
+            final item = specs[index];
+            return ListTile(
+              leading: Icon(item.icon, color: ecoSecondary),
+              title: Text(
+                item.title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: ecoDark,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(
+                item.subtitle,
+                style: theme.textTheme.bodyMedium?.copyWith(color: ecoDark),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildFeatures() {
+  Widget _buildFeatures(ThemeData theme) {
+    // Usa paleta corporativa
     return Card(
-      color: AppColors.mintSurface,
-      shadowColor: AppColors.shadowMint20,
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      key: const Key('about_features'),
+      color: ecoWhite,
+      elevation: 1,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -200,66 +258,32 @@ class AboutScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.star, color: AppColors.secondaryGreen),
+                const Icon(Icons.star, color: ecoCyan),
                 const SizedBox(width: 8),
-                const Text('Funcionalidades', style: _sectionTitleStyle),
+                Text(
+                  'Funcionalidades',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: ecoDark,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _buildFunctionalityItem(
               Icons.dashboard,
               'Dashboard Principal',
-              'Vista general de todos los sensores con datos en tiempo real',
-            ),
-            _buildFunctionalityItem(
-              Icons.settings_input_antenna,
-              'Gestión de Dispositivos',
-              'Configuración y monitoreo del estado de conexión ESP32',
-            ),
-            _buildFunctionalityItem(
-              Icons.photo_library,
-              'Galería de Imágenes',
-              'Visualización de imágenes capturadas por el sistema',
+              'Visualización general de los sensores con datos en tiempo real',
+              Theme.of(context).colorScheme,
+              theme,
             ),
             _buildFunctionalityItem(
               Icons.analytics,
-              'Análisis de Datos',
-              'Gráficos y estadísticas detalladas de los sensores',
+              'Procesamiento y visualización',
+              'Análisis gráfico e interpretación de los valores obtenidos',
+              Theme.of(context).colorScheme,
+              theme,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTeamInfo() {
-    return Card(
-      color: AppColors.mintSurface,
-      shadowColor: AppColors.shadowMint20,
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.group, color: AppColors.secondaryGreen),
-                const SizedBox(width: 8),
-                const Text('Información del Equipo', style: _sectionTitleStyle),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Proyecto desarrollado como parte del curso de Sistemas IoT.',
-              style: _bodyTextStyle,
-            ),
-            const SizedBox(height: 12),
-            _buildTeamMember('👨‍💻', 'Desarrollo de Software', 'Aplicación móvil Flutter'),
-            _buildTeamMember('🔧', 'Hardware IoT', 'Configuración ESP32 y sensores'),
-            _buildTeamMember('🌐', 'Conectividad', 'Protocolos de comunicación'),
-            _buildTeamMember('📊', 'Análisis de Datos', 'Procesamiento y visualización'),
           ],
         ),
       ),
@@ -267,81 +291,52 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildVersionInfo() {
+    final theme = Theme.of(context);
+    final localizations = MaterialLocalizations.of(context);
+    final now = DateTime.now();
+    final dateFormatted = localizations.formatFullDate(now);
+
     return Card(
-      color: AppColors.mintSurface,
-      shadowColor: AppColors.shadowMint20,
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.info_outline, color: AppColors.secondaryGreen),
-                const SizedBox(width: 8),
-                const Text(
-                  'Información de Versión',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildVersionItem('Versión de la App', '1.0.0'),
-            _buildVersionItem('Fecha de Compilación', DateTime.now().toString().split(' ')[0]),
-            _buildVersionItem('Flutter SDK', '3.x.x'),
-            _buildVersionItem('Plataforma', 'Android/iOS'),
-            const SizedBox(height: 16),
-            Text(
-              '© 2024 IoT Monitor App. Todos los derechos reservados.',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.deepGreen.withOpacity(0.6),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+      key: const Key('about_version'),
+      color: ecoWhite,
+      elevation: 1,
+      child: ExpansionTile(
+        title: Text(
+          Strings.versionInfoTitle,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: ecoDark,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildFeatureItem(String emoji, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
+        childrenPadding: const EdgeInsets.only(bottom: 8),
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 8),
-          Text(text, style: const TextStyle(fontSize: 14)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSpecItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              '$title:',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+          ListTile(
+            leading: const Icon(Icons.app_settings_alt, color: ecoSecondary),
+            title: Text(Strings.appVersionLabel),
+            subtitle: Text(
+              Strings.appVersionValue,
+              style: theme.textTheme.bodyMedium,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 14),
+          ListTile(
+            leading: const Icon(Icons.calendar_today, color: ecoSecondary),
+            title: Text(Strings.buildDateLabel),
+            subtitle: Text(dateFormatted, style: theme.textTheme.bodyMedium),
+          ),
+          ListTile(
+            leading: const Icon(Icons.flutter_dash, color: ecoSecondary),
+            title: Text(Strings.flutterSdkLabel),
+            subtitle: Text(
+              'Flutter $flutterSdkVersion',
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.devices, color: ecoSecondary),
+            title: Text(Strings.platformLabel),
+            subtitle: Text(
+              Strings.platformValue,
+              style: theme.textTheme.bodyMedium,
             ),
           ),
         ],
@@ -349,13 +344,19 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFunctionalityItem(IconData icon, String title, String description) {
+  Widget _buildFunctionalityItem(
+    IconData icon,
+    String title,
+    String description,
+    ColorScheme colors,
+    ThemeData theme,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.secondaryGreen, size: 24),
+          Icon(icon, color: ecoCyan, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -363,12 +364,15 @@ class AboutScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.deepGreen),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: ecoDark,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 12, color: AppColors.deepGreen.withOpacity(0.75)),
+                  style: theme.textTheme.bodySmall?.copyWith(color: ecoDark),
                 ),
               ],
             ),
@@ -378,54 +382,33 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamMember(String emoji, String role, String description) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  role,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
+  Widget _buildCopyrightLicense() {
+    return Card(
+      key: const Key('about_copyright'),
+      color: ecoWhite,
+      elevation: 1,
+      child: const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Copyright',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: ecoDark,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVersionItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14, color: AppColors.deepGreen),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.mintAccent),
-          ),
-        ],
+            SizedBox(height: 8),
+            Text(
+              '© 2025 EcoGrid. Todos los derechos reservados.',
+              style: TextStyle(color: ecoDark),
+            ),
+            SizedBox(height: 4),
+            Text('', style: TextStyle(color: ecoDark)),
+          ],
+        ),
       ),
     );
   }
