@@ -1,5 +1,36 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_navigation_widget.dart';
+import '../constants/app_colors.dart';
+
+// Tipografías estándar
+const TextStyle _appBarTitleStyle = TextStyle(
+  color: AppColors.deepGreen,
+  fontWeight: FontWeight.w600,
+);
+
+const TextStyle _screenTitleStyle = TextStyle(
+  fontSize: 24,
+  fontWeight: FontWeight.bold,
+  color: AppColors.deepGreen,
+);
+
+const TextStyle _sectionTitleStyle = TextStyle(
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+  color: AppColors.deepGreen,
+);
+
+const TextStyle _bodyTextStyle = TextStyle(
+  fontSize: 14,
+  height: 1.5,
+  color: AppColors.deepGreen,
+);
+
+const TextStyle _labelTextStyle = TextStyle(
+  fontSize: 14,
+  fontWeight: FontWeight.bold,
+  color: AppColors.deepGreen,
+);
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -10,10 +41,7 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'Acerca de',
-          style: TextStyle(color: Color(0xFF498428)), // Verde oscuro para el texto
-        ),
+        title: const Text('Acerca de', style: _appBarTitleStyle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -40,7 +68,10 @@ class AboutScreen extends StatelessWidget {
 
   Widget _buildProjectHeader() {
     return Card(
-      elevation: 4,
+      color: AppColors.mintSurface,
+      shadowColor: AppColors.shadowMint20,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -49,8 +80,22 @@ class AboutScreen extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFF498428), // Verde oscuro
                 borderRadius: BorderRadius.circular(40),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.mintAccent,
+                    AppColors.tealAccent,
+                  ],
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.shadowMint25,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.sensors,
@@ -59,21 +104,11 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'IoT Monitor App',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF498428), // Verde oscuro
-              ),
-            ),
+            const Text('IoT Monitor App', style: _screenTitleStyle),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Sistema de Monitoreo IoT con ESP32',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: AppColors.deepGreen.withOpacity(0.75)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -84,7 +119,10 @@ class AboutScreen extends StatelessWidget {
 
   Widget _buildProjectDescription() {
     return Card(
-      elevation: 4,
+      color: AppColors.mintSurface,
+      shadowColor: AppColors.shadowMint20,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -92,15 +130,9 @@ class AboutScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.description, color: Color(0xFF498428)), // Verde oscuro
+                const Icon(Icons.description, color: AppColors.secondaryGreen),
                 const SizedBox(width: 8),
-                const Text(
-                  'Descripción del Proyecto',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('Descripción del Proyecto', style: _sectionTitleStyle),
               ],
             ),
             const SizedBox(height: 16),
@@ -108,16 +140,10 @@ class AboutScreen extends StatelessWidget {
               'Esta aplicación móvil permite monitorear en tiempo real sensores IoT conectados a un microcontrolador ESP32. '
               'El sistema recopila datos de temperatura, humedad, pH y TDS (sólidos disueltos totales), '
               'proporcionando una interfaz intuitiva para visualizar y analizar la información.',
-              style: TextStyle(fontSize: 14, height: 1.5),
+              style: _bodyTextStyle,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Características principales:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Características principales:', style: _labelTextStyle),
             const SizedBox(height: 8),
             _buildFeatureItem('📊', 'Monitoreo en tiempo real'),
             _buildFeatureItem('📱', 'Interfaz móvil intuitiva'),
@@ -132,7 +158,10 @@ class AboutScreen extends StatelessWidget {
 
   Widget _buildTechnicalSpecs() {
     return Card(
-      elevation: 4,
+      color: AppColors.mintSurface,
+      shadowColor: AppColors.shadowMint20,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -140,15 +169,9 @@ class AboutScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.memory, color: Color(0xFF498428)), // Verde oscuro
+                const Icon(Icons.memory, color: AppColors.secondaryGreen),
                 const SizedBox(width: 8),
-                const Text(
-                  'Especificaciones Técnicas',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('Especificaciones Técnicas', style: _sectionTitleStyle),
               ],
             ),
             const SizedBox(height: 16),
@@ -166,7 +189,10 @@ class AboutScreen extends StatelessWidget {
 
   Widget _buildFeatures() {
     return Card(
-      elevation: 4,
+      color: AppColors.mintSurface,
+      shadowColor: AppColors.shadowMint20,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -174,15 +200,9 @@ class AboutScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.star, color: Color(0xFF498428)), // Verde oscuro
+                const Icon(Icons.star, color: AppColors.secondaryGreen),
                 const SizedBox(width: 8),
-                const Text(
-                  'Funcionalidades',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('Funcionalidades', style: _sectionTitleStyle),
               ],
             ),
             const SizedBox(height: 16),
@@ -214,7 +234,10 @@ class AboutScreen extends StatelessWidget {
 
   Widget _buildTeamInfo() {
     return Card(
-      elevation: 4,
+      color: AppColors.mintSurface,
+      shadowColor: AppColors.shadowMint20,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -222,21 +245,15 @@ class AboutScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.group, color: Color(0xFF498428)), // Verde oscuro
+                const Icon(Icons.group, color: AppColors.secondaryGreen),
                 const SizedBox(width: 8),
-                const Text(
-                  'Información del Equipo',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('Información del Equipo', style: _sectionTitleStyle),
               ],
             ),
             const SizedBox(height: 16),
             const Text(
               'Proyecto desarrollado como parte del curso de Sistemas IoT.',
-              style: TextStyle(fontSize: 14),
+              style: _bodyTextStyle,
             ),
             const SizedBox(height: 12),
             _buildTeamMember('👨‍💻', 'Desarrollo de Software', 'Aplicación móvil Flutter'),
@@ -251,7 +268,9 @@ class AboutScreen extends StatelessWidget {
 
   Widget _buildVersionInfo() {
     return Card(
-      elevation: 4,
+      color: AppColors.mintSurface,
+      shadowColor: AppColors.shadowMint20,
+      elevation: 6,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -259,7 +278,7 @@ class AboutScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.info_outline, color: Color(0xFF498428)), // Verde oscuro
+                const Icon(Icons.info_outline, color: AppColors.secondaryGreen),
                 const SizedBox(width: 8),
                 const Text(
                   'Información de Versión',
@@ -276,11 +295,11 @@ class AboutScreen extends StatelessWidget {
             _buildVersionItem('Flutter SDK', '3.x.x'),
             _buildVersionItem('Plataforma', 'Android/iOS'),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               '© 2024 IoT Monitor App. Todos los derechos reservados.',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: AppColors.deepGreen.withOpacity(0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -336,7 +355,7 @@ class AboutScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: const Color(0xFF2196F3), size: 24),
+          Icon(icon, color: AppColors.secondaryGreen, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -344,18 +363,12 @@ class AboutScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.deepGreen),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: AppColors.deepGreen.withOpacity(0.75)),
                 ),
               ],
             ),
@@ -406,15 +419,11 @@ class AboutScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 14, color: AppColors.deepGreen),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2196F3),
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.mintAccent),
           ),
         ],
       ),

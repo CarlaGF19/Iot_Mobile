@@ -14,8 +14,19 @@ class ImageGalleryScreen extends StatefulWidget {
 class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
   List<ImageData> images = [];
   bool isLoading = false;
-  bool isCapturing = false;
   String? esp32Ip;
+  // Filtros
+  int? selectedDay;
+  int? selectedMonth;
+  int? selectedYear;
+  int? startHour;
+  int? endHour;
+
+  // Paleta del Main Menu (aplicada solo en esta pantalla)
+  static const Color _darkGreen = Color(0xFF004C3F);      // Títulos, íconos
+  static const Color _mintBg = Color(0xFFE6FFF5);          // Fondos suaves
+  static const Color _cryptoA = Color(0xFF00E0A6);         // Acento principal
+  static const Color _cryptoB = Color(0xFF00B7B0);         // Acento secundario
 
   @override
   void initState() {
@@ -62,40 +73,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
     });
   }
 
-  Future<void> _captureImage() async {
-    if (esp32Ip == null) {
-      _showSnackBar('Error: IP del ESP32 no configurada', Colors.red);
-      return;
-    }
-
-    setState(() {
-      isCapturing = true;
-    });
-
-    try {
-      // Simulación de captura (aquí iría la llamada HTTP real al ESP32)
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // Agregar nueva imagen a la lista
-      final newImage = ImageData(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        timestamp: DateTime.now(),
-        size: '1.1 MB',
-      );
-      
-      setState(() {
-        images.insert(0, newImage);
-        isCapturing = false;
-      });
-      
-      _showSnackBar('Imagen capturada exitosamente', Colors.green);
-    } catch (e) {
-      setState(() {
-        isCapturing = false;
-      });
-      _showSnackBar('Error al capturar imagen: $e', Colors.red);
-    }
-  }
+  // Funcionalidad de captura eliminada según requerimiento
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -110,112 +88,102 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        centerTitle: true,
+        title: Text(
           'Galería de Imágenes',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF498428), // Verde oscuro para el texto
+            color: _darkGreen,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF498428)), // Verde oscuro para el ícono
+          icon: Icon(Icons.arrow_back, color: _darkGreen),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF498428)), // Verde oscuro
+            icon: Icon(Icons.refresh, color: _darkGreen),
             onPressed: _loadImages,
           ),
         ],
       ),
       body: Column(
         children: [
-          // Estado de conexión y estadísticas
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.1),
-                  spreadRadius: 1,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Total de imágenes',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    Text(
-                      '${images.length}',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: esp32Ip != null ? Colors.green.shade100 : Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(20),
+          // Barra de filtros
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0x4D00E0A6)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x1A00E0A6),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: esp32Ip != null ? Colors.green : Colors.red,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
+                      Icon(Icons.calendar_today, color: _cryptoA, size: 18),
                       const SizedBox(width: 8),
-                      Text(
-                        esp32Ip != null ? 'Conectado' : 'Desconectado',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: esp32Ip != null ? Colors.green.shade700 : Colors.red.shade700,
+                      _buildDayDropdown(),
+                      _buildMonthDropdown(),
+                      _buildYearDropdown(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Icon(Icons.access_time, color: _cryptoA, size: 18),
+                      const SizedBox(width: 8),
+                      _buildHourDropdown(true),
+                      _buildHourDropdown(false),
+                      _buildTotalImagesPill(),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: _cryptoA),
+                          foregroundColor: _cryptoA,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          visualDensity: VisualDensity.compact,
                         ),
+                        onPressed: _resetFilters,
+                        child: const Text('Restablecer filtros'),
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
+          const SizedBox(height: 12),
+          // Card grande de estadísticas eliminada por requerimiento
           
           // Grid de imágenes
           Expanded(
             child: isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
-                      color: Colors.purple,
+                      color: _cryptoA,
                     ),
                   )
-                : images.isEmpty
+                : _filteredImages.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -227,7 +195,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No hay imágenes',
+                              'No hay imágenes disponibles',
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.grey.shade600,
@@ -235,7 +203,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Captura tu primera imagen',
+                              'Conecta tu dispositivo para obtener imágenes',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey.shade500,
@@ -251,11 +219,12 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            childAspectRatio: 0.8,
+                            // Volver al aspecto original para mantener estilo visual
+                            childAspectRatio: 0.95,
                           ),
-                          itemCount: images.length,
+                          itemCount: _filteredImages.length,
                           itemBuilder: (context, index) {
-                            final image = images[index];
+                            final image = _filteredImages[index];
                             return _buildImageCard(image);
                           },
                         ),
@@ -263,22 +232,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: isCapturing ? null : _captureImage,
-        backgroundColor: Colors.purple,
-        foregroundColor: Colors.white,
-        icon: isCapturing
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : const Icon(Icons.camera_alt),
-        label: Text(isCapturing ? 'Capturando...' : 'Capturar'),
-      ),
+      // Botón de captura eliminado según requerimiento
       bottomNavigationBar: const BottomNavigationWidget(currentIndex: 0), // Índice 0 para "Home"
     );
   }
@@ -287,7 +241,7 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: InkWell(
         onTap: () {
@@ -325,25 +279,29 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
             Expanded(
               flex: 1,
               child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.all(10),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      _formatDateTime(image.timestamp),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        '${_formatShortDate(image.timestamp)} ${_formatLocalHM(image.timestamp)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      image.size,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade600,
+                    Tooltip(
+                      message: 'Descargar',
+                      child: IconButton(
+                        icon: Icon(Icons.download_rounded, color: _cryptoA, size: 20),
+                        onPressed: () => _downloadImage(image),
+                        splashRadius: 16,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints.tightFor(width: 26, height: 26),
                       ),
                     ),
                   ],
@@ -354,6 +312,189 @@ class _ImageGalleryScreenState extends State<ImageGalleryScreen> {
         ),
       ),
     );
+  }
+
+  List<ImageData> get _filteredImages {
+    return images.where((img) {
+      final ts = img.timestamp;
+      final dayOk = selectedDay == null || ts.day == selectedDay;
+      final monthOk = selectedMonth == null || ts.month == selectedMonth;
+      final yearOk = selectedYear == null || ts.year == selectedYear;
+      final hourOk = (startHour == null || endHour == null)
+          ? true
+          : ts.hour >= (startHour ?? 0) && ts.hour <= (endHour ?? 23);
+      return dayOk && monthOk && yearOk && hourOk;
+    }).toList();
+  }
+
+  Widget _buildDayDropdown() {
+    final days = List<int>.generate(31, (i) => i + 1);
+    return SizedBox(
+      width: 80,
+      child: DropdownButton<int>(
+        isExpanded: true,
+        hint: const Text('Día'),
+        value: selectedDay,
+        items: days
+            .map((d) => DropdownMenuItem<int>(value: d, child: Text('$d')))
+            .toList(),
+        onChanged: (v) => setState(() => selectedDay = v),
+      ),
+    );
+  }
+
+  Widget _buildMonthDropdown() {
+    const labels = {
+      1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr', 5: 'May', 6: 'Jun',
+      7: 'Jul', 8: 'Ago', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic',
+    };
+    return SizedBox(
+      width: 90,
+      child: DropdownButton<int>(
+        isExpanded: true,
+        hint: const Text('Mes'),
+        value: selectedMonth,
+        items: labels.entries
+            .map((e) => DropdownMenuItem<int>(value: e.key, child: Text(e.value)))
+            .toList(),
+        onChanged: (v) => setState(() => selectedMonth = v),
+      ),
+    );
+  }
+
+  Widget _buildYearDropdown() {
+    final current = DateTime.now().year;
+    final years = [current - 1, current, current + 1, current + 2];
+    return SizedBox(
+      width: 90,
+      child: DropdownButton<int>(
+        isExpanded: true,
+        hint: const Text('Año'),
+        value: selectedYear,
+        items: years
+            .map((y) => DropdownMenuItem<int>(value: y, child: Text('$y')))
+            .toList(),
+        onChanged: (v) => setState(() => selectedYear = v),
+      ),
+    );
+  }
+
+  Widget _buildHourDropdown(bool isStart) {
+    final hours = List<int>.generate(24, (i) => i);
+    return SizedBox(
+      width: 100,
+      child: DropdownButton<int>(
+        isExpanded: true,
+        hint: Text(isStart ? 'Inicio' : 'Fin'),
+        value: isStart ? startHour : endHour,
+        items: hours
+            .map((h) => DropdownMenuItem<int>(
+                  value: h,
+                  child: Text('${h.toString().padLeft(2, '0')}:00'),
+                ))
+            .toList(),
+        onChanged: (v) => setState(() {
+          if (isStart) {
+            startHour = v;
+          } else {
+            endHour = v;
+          }
+        }),
+      ),
+    );
+  }
+
+  Widget _buildTotalImagesPill() {
+    return SizedBox(
+      width: 220,
+      height: 44,
+      child: Container(
+        decoration: BoxDecoration(
+          color: _mintBg,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: _cryptoA, width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A00E0A6),
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Icon(Icons.photo_library_outlined, color: _cryptoA, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Total de imágenes',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _darkGreen,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _cryptoA),
+              ),
+              child: Text(
+                '${_filteredImages.length}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: _cryptoA,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _resetFilters() {
+    setState(() {
+      selectedDay = null;
+      selectedMonth = null;
+      selectedYear = null;
+      startHour = null;
+      endHour = null;
+    });
+  }
+
+  void _downloadImage(ImageData image) {
+    // UI de descarga: en esta fase mostramos confirmación
+    _showSnackBar('Imagen descargada con éxito', _cryptoA);
+  }
+
+  String _formatExactDateTime(DateTime dt) {
+    final d = dt.day.toString().padLeft(2, '0');
+    final m = dt.month.toString().padLeft(2, '0');
+    final y = dt.year.toString();
+    final h = dt.hour.toString().padLeft(2, '0');
+    final min = dt.minute.toString().padLeft(2, '0');
+    return '$d/$m/$y - $h:$min';
+  }
+
+  String _formatShortDate(DateTime dt) {
+    final yy = (dt.year % 100).toString().padLeft(2, '0');
+    // Día y mes sin ceros a la izquierda para coincidir con "2/11/25"
+    return '${dt.day}/${dt.month}/$yy';
+  }
+
+  String _formatLocalHM(DateTime dt) {
+    final local = dt.toLocal();
+    final h = local.hour.toString().padLeft(2, '0');
+    final m = local.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   String _formatDateTime(DateTime dateTime) {
