@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' as ui;
 import 'sensor_dashboard_screen.dart';
 import 'image_gallery_screen.dart';
 import '../widgets/bottom_navigation_widget.dart';
@@ -158,16 +159,16 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     // Módulo introductorio
                     _buildIntroductoryModule(),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 8),
 
                     // Accesos Rápidos
                     _buildQuickAccess(),
@@ -187,46 +188,76 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.school, color: Color(0xFF498428), size: 24),
+                const Icon(Icons.school, color: Color(0xFF009E73), size: 24),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
                     'Guía',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF004C3F),
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
+              child: InkWell(
+                onTap: () {
                   // Aquí se puede agregar la navegación al módulo introductorio
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Módulo introductorio próximamente'),
-                      backgroundColor: Color(0xFF498428),
+                      backgroundColor: Color(0xFF00E0A6),
                     ),
                   );
                 },
-                icon: const Icon(Icons.play_circle_outline),
-                label: const Text(
-                  'Módulo introductorio',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF498428),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF00E0A6),
+                        Color(0xFF00B7B0),
+                      ],
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x6600E0A6),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.play_circle_outline, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Módulo introductorio',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -239,7 +270,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
   Widget _buildQuickAccess() {
     double screenWidth = MediaQuery.of(context).size.width;
-    double cardPadding = (screenWidth * 0.04).clamp(16.0, 20.0);
+    double cardPadding = (screenWidth * 0.035).clamp(14.0, 18.0);
     double buttonSpacing = (screenWidth * 0.015).clamp(10.0, 12.0);
     
     return Card(
@@ -247,15 +278,25 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF98C98D).withOpacity(0.4), // Efecto glass
-          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFFE6FFF5), // fondo tarjeta verde muy claro (crypto)
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFFCEE2BE).withOpacity(0.6),
+            color: const Color(0xFFE6FFF5),
             width: 1,
           ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x2600A078), // sombra suave rgba(0,160,120,0.15)
+              blurRadius: 12,
+              offset: Offset(0, 6),
+            ),
+          ],
         ),
         child: Padding(
-          padding: EdgeInsets.all(cardPadding),
+          padding: EdgeInsets.symmetric(
+            horizontal: cardPadding,
+            vertical: cardPadding * 0.6,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -264,21 +305,22 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 children: [
                   const Icon(
                     Icons.flash_on,
-                    color: Color(0xFF00444D), // Color principal de la paleta
+                    color: Color(0xFF009E73), // icono secundario crypto
                     size: 24,
                   ),
                   SizedBox(width: buttonSpacing * 0.8),
                   const Text(
                     'Accesos Rápidos',
                     style: TextStyle(
-                      fontSize: 18, 
+                      fontSize: 17, 
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF00444D), // Color principal de la paleta
+                      color: Color(0xFF004C3F), // texto principal crypto
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: cardPadding * 0.8),
+              SizedBox(height: cardPadding * 0.5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -287,7 +329,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     child: _buildQuickAccessButton(
                       'Sensores',
                       Icons.dashboard,
-                      const Color(0xFF63B069), // Verde medio de la paleta
+                      const Color(0xFF43A047), // Verde 600
                       () {
                         Navigator.push(
                           context,
@@ -305,7 +347,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     child: _buildQuickAccessButton(
                       'Galería',
                       Icons.photo_library,
-                      const Color(0xFF247E5A), // Verde oscuro de la paleta
+                      const Color(0xFF2E7D32), // Verde 800
                       () {
                         Navigator.push(
                           context,
@@ -331,26 +373,55 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     Color color,
     VoidCallback onTap,
   ) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double containerHeight = (screenWidth * 0.22).clamp(80.0, 110.0);
+    double internalPadding = (screenWidth * 0.028).clamp(12.0, 16.0);
+    double iconSize = (screenWidth * 0.085).clamp(30.0, 36.0);
+    double textSize = (screenWidth * 0.036).clamp(13.0, 15.0);
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        height: containerHeight,
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(
+          horizontal: internalPadding,
+          vertical: internalPadding * 0.8,
+        ),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3)),
+          // Gradiente crypto green
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF00E0A6),
+              Color(0xFF00B7B0),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x6600E0A6),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 32),
+            // Ícono con tono mint por encima del gradiente
+            Icon(icon, color: Color(0xFF00E0A6), size: iconSize),
             const SizedBox(height: 8),
             Text(
               title,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: color,
+                fontSize: textSize,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                letterSpacing: 0.2,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -366,27 +437,75 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
       width: double.infinity,
-      height: screenHeight * 0.35, // 35% de la altura de la pantalla
+      height: screenHeight * 0.41, // 41% del alto de pantalla
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.black.withOpacity(0.15),
             spreadRadius: 2,
-            blurRadius: 8,
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
         ),
-        child: _buildImageContent(),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Imagen de fondo
+            _buildImageContent(),
+
+            // Controles superiores sobre la imagen
+            SafeArea(
+              child: Stack(
+                children: [
+                  // Izquierda superior
+                  Positioned(
+                    left: 12,
+                    top: 6, // más arriba dentro del header
+                    child: _buildCircularTopButton(
+                      icon: Icons.arrow_back_ios_new, // flecha más delgada
+                      baseIconColor: const Color(0xFF004C3F),
+                      onTap: () {
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      semanticsLabel: 'Atrás',
+                    ),
+                  ),
+                  // Derecha superior
+                  Positioned(
+                    right: 12,
+                    top: 6, // más arriba dentro del header
+                    child: _buildCircularTopButton(
+                      icon: Icons.notifications_none_outlined, // campana de notificaciones
+                      showBadge: true,
+                      baseIconColor: const Color(0xFF004C3F),
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Notificaciones próximamente'),
+                            backgroundColor: Color(0xFF3C8D2F),
+                          ),
+                        );
+                      },
+                      semanticsLabel: 'Acción',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -423,6 +542,104 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
           image: AssetImage('assets/images/img_main_menu_screen.jpg'),
           fit: BoxFit.cover,
         ),
+      ),
+    );
+  }
+
+  // Botón circular reutilizable para controles superiores
+  Widget _buildCircularTopButton({
+    required IconData icon,
+    bool showBadge = false,
+    required Color baseIconColor,
+    required VoidCallback onTap,
+    required String semanticsLabel,
+  }) {
+    bool isHovered = false;
+    bool isPressed = false;
+    return Semantics(
+      label: semanticsLabel,
+      button: true,
+      child: StatefulBuilder(
+        builder: (context, setInnerState) {
+          Color effectiveIconColor = (isHovered || isPressed) ? Colors.white : baseIconColor;
+          return MouseRegion(
+            onEnter: (_) => setInnerState(() => isHovered = true),
+            onExit: (_) => setInnerState(() => isHovered = false),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(24),
+              onHighlightChanged: (value) => setInnerState(() => isPressed = value),
+              hoverColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              child: ClipOval(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.35),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.5),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        // Sombra de caída suave con tono mint (crypto)
+                        const BoxShadow(
+                          color: Color(0x4000E0A6), // rgba(0,224,166,0.25)
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                        // Halo energético (se intensifica en hover/press)
+                        BoxShadow(
+                          color: (isHovered || isPressed)
+                              ? const Color(0x9900E0A6) // rgba(0,224,166,0.6)
+                              : const Color(0x3300E0A6), // sutil en reposo
+                          blurRadius: (isHovered || isPressed) ? 12 : 8,
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Center(
+                          child: Icon(
+                            icon,
+                            color: effectiveIconColor,
+                            size: 20,
+                          ),
+                        ),
+                        if (showBadge)
+                          Positioned(
+                            right: -2,
+                            top: -2,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF66BB6A),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 1),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x2600E0A6), // sombra sutil acorde
+                                    blurRadius: 2,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
