@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +17,8 @@ class SensorDashboardScreen extends StatefulWidget {
 
 class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
   String? esp32Ip;
+  // Eliminados controles de filtros (año/hora) según requerimiento
+  // Eliminamos el contador de imágenes del dashboard de sensores para respetar la separación de pestañas
 
   @override
   void initState() {
@@ -32,6 +33,15 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
       esp32Ip = prefs.getString("esp32_ip");
     });
   }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  // Eliminado validador de año
+
 
   Future<void> _setIpDialog() async {
     final TextEditingController controller = TextEditingController(
@@ -114,32 +124,38 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          // Ratio consistente y equilibrado del contenedor
-          childAspectRatio: 0.90,
+        child: Column(
           children: [
-            SensorCardWithImage(
-              titulo: "TEMPERATURA",
-              imagePath: "assets/images/sensor_dashboard/s_temp.png",
-              onTap: () => _abrirSensor("temperatura", "Temperatura"),
-            ),
-            SensorCardWithImage(
-              titulo: "HUMEDAD",
-              imagePath: "assets/images/sensor_dashboard/s_humedad.png",
-              onTap: () => _abrirSensor("humedad", "Humedad"),
-            ),
-            SensorCardWithImage(
-              titulo: "PH",
-              imagePath: "assets/images/sensor_dashboard/s_ph.png",
-              onTap: () => _abrirSensor("ph", "pH"),
-            ),
-            SensorCardWithImage(
-              titulo: "TDS",
-              imagePath: "assets/images/sensor_dashboard/s_tds.png",
-              onTap: () => _abrirSensor("tds", "TDS"),
+            // Eliminada barra de entrada de año/hora
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.90,
+                children: [
+                  SensorCardWithImage(
+                    titulo: "TEMPERATURA",
+                    imagePath: "assets/images/sensor_dashboard/s_temp.png",
+                    onTap: () => _abrirSensor("temperatura", "Temperatura"),
+                  ),
+                  SensorCardWithImage(
+                    titulo: "HUMEDAD",
+                    imagePath: "assets/images/sensor_dashboard/s_humedad.png",
+                    onTap: () => _abrirSensor("humedad", "Humedad"),
+                  ),
+                  SensorCardWithImage(
+                    titulo: "PH",
+                    imagePath: "assets/images/sensor_dashboard/s_ph.png",
+                    onTap: () => _abrirSensor("ph", "pH"),
+                  ),
+                  SensorCardWithImage(
+                    titulo: "TDS",
+                    imagePath: "assets/images/sensor_dashboard/s_tds.png",
+                    onTap: () => _abrirSensor("tds", "TDS"),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -714,3 +730,7 @@ class SensorActionInfo extends StatelessWidget {
     );
   }
 }
+
+// Eliminado el formateador de hora HH:MM según requerimiento
+
+// Tarjeta de total de imágenes eliminada del sensor dashboard (se moverá a la galería)

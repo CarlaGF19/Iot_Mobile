@@ -10,6 +10,7 @@ import 'screens/image_gallery_screen.dart';
 import 'screens/image_detail_screen.dart';
 import 'screens/device_connection_screen.dart';
 import 'screens/about_screen.dart';
+import 'screens/notifications_screen.dart';
 import 'models/image_data.dart';
 
 void main() {
@@ -71,6 +72,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/about',
       builder: (context, state) => const AboutScreen(),
+    ),
+    GoRoute(
+      path: '/notifications',
+      builder: (context, state) => const NotificationsScreen(),
     ),
   ],
 );

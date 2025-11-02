@@ -212,4 +212,4 @@ dependencies:
 
 ---
 
-*Documentación generada automáticamente - Última actualización: Diciembre 2024*
+*Documentación generada automáticamente - Última actualización: Oct 2025*

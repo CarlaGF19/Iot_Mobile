@@ -37,7 +37,7 @@ class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Fondo blanco
+      backgroundColor: Colors.white, // Fondo blanco (consistente con MainMenu)
       appBar: AppBar(
         backgroundColor: Colors.transparent, // AppBar transparente
         elevation: 0,
@@ -47,9 +47,9 @@ class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
         clipBehavior: Clip.none, // Sin recorte que pueda crear bordes redondeados
         title: const Text(
           "Configurar IP del ESP32",
-          style: TextStyle(color: Color(0xFF498428)), // Verde oscuro para el texto
+          style: TextStyle(color: Color(0xFF004C3F)), // Verde oscuro del MainMenu
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF498428)), // Verde oscuro para los iconos
+        iconTheme: const IconThemeData(color: Color(0xFF004C3F)), // Verde oscuro del MainMenu
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -59,7 +59,7 @@ class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
             const Text(
               "Ingresa la dirección IP del ESP32",
               style: TextStyle(
-                color: Color(0xFF498428), // Verde oscuro para el texto
+                color: Color(0xFF004C3F), // Verde oscuro del MainMenu
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -69,22 +69,22 @@ class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
               controller: _ipController,
               decoration: const InputDecoration(
                 labelText: "Ejemplo: http://192.168.1.10",
-                labelStyle: TextStyle(color: Color(0xFF80B155)), // Verde medio para el label
+                labelStyle: TextStyle(color: Color(0xFF009E73)), // Verde secundario del MainMenu
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF498428), width: 2), // Verde oscuro para el borde activo
+                  borderSide: BorderSide(color: Color(0xFF00E0A6), width: 2), // Mint del MainMenu en foco
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF80B155)), // Verde medio para el borde normal
+                  borderSide: BorderSide(color: Color(0xFF00B7B0)), // Teal del MainMenu en reposo
                 ),
               ),
-              style: const TextStyle(color: Color(0xFF498428)), // Verde oscuro para el texto ingresado
+              style: const TextStyle(color: Color(0xFF004C3F)), // Verde oscuro del MainMenu para el texto
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: _saveIp,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF80B155), // Verde medio para el fondo del botón
+                backgroundColor: const Color(0xFF00B7B0), // Teal del MainMenu
                 foregroundColor: Colors.white, // Texto blanco
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -105,7 +105,7 @@ class _DeviceConfigScreenState extends State<DeviceConfigScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         mini: true,
-        backgroundColor: const Color(0xFF498428), // Verde oscuro en lugar del azul
+        backgroundColor: const Color(0xFF004C3F), // Verde oscuro del MainMenu
         onPressed: () {
           context.go('/main-menu');
         },

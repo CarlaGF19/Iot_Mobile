@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -7,6 +8,7 @@ import 'dart:ui' as ui;
 import 'sensor_dashboard_screen.dart';
 import 'image_gallery_screen.dart';
 import '../widgets/bottom_navigation_widget.dart';
+import '../constants/app_icons.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({super.key});
@@ -163,7 +165,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
 
                     // Módulo introductorio
                     _buildIntroductoryModule(),
@@ -321,45 +323,49 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 ],
               ),
               SizedBox(height: cardPadding * 0.5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Flexible(
-                    flex: 1,
-                    child: _buildQuickAccessButton(
-                      'Sensores',
-                      Icons.dashboard,
-                      const Color(0xFF43A047), // Verde 600
-                      () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                SensorDashboardScreen(ip: _esp32Ip),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: buttonSpacing),
-                  Flexible(
-                    flex: 1,
-                    child: _buildQuickAccessButton(
-                      'Galería',
-                      Icons.photo_library,
-                      const Color(0xFF2E7D32), // Verde 800
-                      () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ImageGalleryScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+  Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      Flexible(
+        flex: 1,
+        child: _buildQuickAccessButton(
+          'Sensores',
+          Icons.dashboard,
+          const Color(0xFF43A047), // Verde 600
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    SensorDashboardScreen(ip: _esp32Ip),
               ),
+            );
+          },
+          iconAsset: AppIcons.sensor,
+          iconScale: 1.5,
+        ),
+      ),
+      SizedBox(width: buttonSpacing),
+       Flexible(
+         flex: 1,
+         child: _buildQuickAccessButton(
+           'Galería',
+           Icons.photo_library,
+           const Color(0xFF2E7D32), // Verde 800
+           () {
+             Navigator.push(
+               context,
+               MaterialPageRoute(
+                 builder: (context) => const ImageGalleryScreen(),
+               ),
+             );
+           },
+           iconAsset: AppIcons.gallery,
+            iconScale: 1.5,
+         ),
+       ),
+    ],
+  ),
             ],
           ),
         ),
@@ -371,65 +377,118 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     String title,
     IconData icon,
     Color color,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    String? iconAsset,
+    double? iconScale,
+  }) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double containerHeight = (screenWidth * 0.22).clamp(80.0, 110.0);
+    double containerHeightBase = (screenWidth * 0.22).clamp(80.0, 110.0);
     double internalPadding = (screenWidth * 0.028).clamp(12.0, 16.0);
     double iconSize = (screenWidth * 0.085).clamp(30.0, 36.0);
     double textSize = (screenWidth * 0.036).clamp(13.0, 15.0);
+    double effectiveIconSize = iconSize * (iconScale ?? 1.0);
+    // Estimamos la altura necesaria en función del icono, texto y padding,
+    // y garantizamos que el contenedor sea lo suficientemente alto para evitar overflow.
+    double contentHeightEstimate =
+        effectiveIconSize + 8 /*espaciado*/ + (textSize * 1.6) + (internalPadding * 1.6);
+    double containerHeight = contentHeightEstimate > containerHeightBase
+        ? contentHeightEstimate
+        : containerHeightBase;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        height: containerHeight,
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(
-          horizontal: internalPadding,
-          vertical: internalPadding * 0.8,
-        ),
-        decoration: BoxDecoration(
-          // Gradiente crypto green
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF00E0A6),
-              Color(0xFF00B7B0),
-            ],
+    // Estados de hover/press para web/desktop
+    bool isHovered = false;
+    bool isPressed = false;
+
+    return StatefulBuilder(
+      builder: (context, setInnerState) {
+        double scaleFactor = isPressed ? 0.985 : (isHovered ? 1.02 : 1.0);
+        final List<BoxShadow> dynamicShadows = [
+          const BoxShadow(
+            color: Color(0x6600E0A6),
+            blurRadius: 10,
+            offset: Offset(0, 4),
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x6600E0A6),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Ícono con tono mint por encima del gradiente
-            Icon(icon, color: Color(0xFF00E0A6), size: iconSize),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: textSize,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-                letterSpacing: 0.2,
+          BoxShadow(
+            color: (isHovered || isPressed)
+                ? const Color(0x3300E0A6)
+                : const Color(0x1A00E0A6),
+            blurRadius: (isHovered || isPressed) ? 14 : 8,
+            offset: const Offset(0, 0),
+          ),
+        ];
+
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setInnerState(() => isHovered = true),
+          onExit: (_) => setInnerState(() => isHovered = false),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16),
+            onHighlightChanged: (v) => setInnerState(() => isPressed = v),
+            hoverColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            child: AnimatedScale(
+              scale: scaleFactor,
+              duration: const Duration(milliseconds: 140),
+              curve: Curves.easeOut,
+              child: Container(
+                height: containerHeight,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(
+                  horizontal: internalPadding,
+                  vertical: internalPadding * 0.8,
+                ),
+                decoration: BoxDecoration(
+                  // Gradiente crypto green
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF00E0A6),
+                      Color(0xFF00B7B0),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: dynamicShadows,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Ícono con ligero desplazamiento en hover
+                    Transform.translate(
+                      offset: Offset(0, isHovered ? -2 : 0),
+                      child: iconAsset != null
+                          ? Image.asset(
+                              iconAsset,
+                              width: effectiveIconSize,
+                              height: effectiveIconSize,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(icon, color: const Color(0xFF00E0A6), size: effectiveIconSize),
+                            )
+                          : Icon(icon, color: const Color(0xFF00E0A6), size: effectiveIconSize),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: textSize,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        letterSpacing: 0.2,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -437,7 +496,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
       width: double.infinity,
-      height: screenHeight * 0.41, // 41% del alto de pantalla
+      height: (screenHeight * 0.37), // 37% de la pantalla según preferencia
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(20),
@@ -475,8 +534,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                       icon: Icons.arrow_back_ios_new, // flecha más delgada
                       baseIconColor: const Color(0xFF004C3F),
                       onTap: () {
-                        if (Navigator.canPop(context)) {
-                          Navigator.pop(context);
+                        // Navegar directamente a la pantalla de configuración de IP
+                        if (mounted) {
+                          context.go('/ip');
                         }
                       },
                       semanticsLabel: 'Atrás',
@@ -491,12 +551,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                       showBadge: true,
                       baseIconColor: const Color(0xFF004C3F),
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Notificaciones próximamente'),
-                            backgroundColor: Color(0xFF3C8D2F),
-                          ),
-                        );
+                        if (mounted) {
+                          context.go('/notifications');
+                        }
                       },
                       semanticsLabel: 'Acción',
                     ),
