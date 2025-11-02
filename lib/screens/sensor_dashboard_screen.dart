@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -220,6 +222,7 @@ class SensorCardWithImage extends StatefulWidget {
 
 class _SensorCardWithImageState extends State<SensorCardWithImage> {
   bool _isHovered = false;
+  bool _isPressed = false;
 
   // Paletas por sensor (Cristales Sensoriales)
   List<Color> _gradientFor(String titulo) {
@@ -265,37 +268,58 @@ class _SensorCardWithImageState extends State<SensorCardWithImage> {
     final List<Color> gradColors = _gradientFor(widget.titulo);
     final Color baseColor = gradColors.first;
     final Color accentColor = _accentFor(widget.titulo);
-    // Sombras exteriores con foco inferior y profundidad suave.
+    // Sombras exteriores con relieve dinámico en hover/press (sin cambiar colores).
     final List<BoxShadow> outerShadows = [
       BoxShadow(
-        color: baseColor.withOpacity(0.28), // foco inferior ovalado tintado
-        blurRadius: 24,
-        offset: const Offset(0, 8),
+        color: baseColor.withOpacity(0.28),
+        blurRadius: _isPressed ? 20 : (_isHovered ? 28 : 24),
+        offset: Offset(0, _isPressed ? 6 : 8),
       ),
       BoxShadow(
-        color: baseColor.withOpacity(0.16), // segunda sombra difusa
-        blurRadius: 12,
-        offset: const Offset(0, 4),
+        color: baseColor.withOpacity(0.16),
+        blurRadius: _isPressed ? 10 : (_isHovered ? 16 : 12),
+        offset: Offset(0, _isPressed ? 3 : 4),
       ),
-    ];
-    if (_isHovered) {
-      outerShadows.add(
+      if (_isHovered)
         BoxShadow(
-          color: accentColor.withOpacity(0.35), // halo tenue en hover
-          blurRadius: 16,
-          spreadRadius: 1,
+          color: accentColor.withOpacity(0.35),
+          blurRadius: 22,
+          spreadRadius: 2,
           offset: const Offset(0, 0),
         ),
-      );
-    }
+    ];
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOut,
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapCancel: () => setState(() => _isPressed = false),
+        // Mantener el estado presionado un poco más para que el brillo se perciba
+        onTapUp: (_) {
+          Future.delayed(const Duration(milliseconds: 220), () {
+            if (mounted) setState(() => _isPressed = false);
+          });
+        },
+        // Brillo al pasar con gesto táctil (sin necesidad de tap)
+        onPanStart: (_) => setState(() => _isHovered = true),
+        onPanUpdate: (_) => setState(() => _isHovered = true),
+        onPanEnd: (_) => setState(() => _isHovered = false),
+        onTap: () {
+          // Sonido de tap sin modificar colores ni temas
+          SystemSound.play(SystemSoundType.click);
+          // Retrasar navegación para que el glow/flash se vea claramente
+          Future.delayed(const Duration(milliseconds: 220), () {
+            widget.onTap();
+          });
+        },
+        child: AnimatedScale(
+          // Prioriza press sobre hover; sin cambios de color
+          scale: _isPressed ? 0.985 : (_isHovered ? 1.03 : 1.0),
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOut,
           constraints: const BoxConstraints(minHeight: 240),
           decoration: BoxDecoration(
             // Degradado metálico-luminoso premium
@@ -313,10 +337,27 @@ class _SensorCardWithImageState extends State<SensorCardWithImage> {
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.white.withOpacity(_isHovered ? 0.85 : 0.75),
-              width: _isHovered ? 2.0 : 1.8,
+              color: Colors.white
+                  .withOpacity(_isPressed ? 1.0 : (_isHovered ? 0.85 : 0.75)),
+              width: _isPressed ? 3.0 : (_isHovered ? 2.0 : 1.8),
             ),
-            boxShadow: outerShadows,
+            boxShadow: _isPressed
+                ? [
+                    ...outerShadows,
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.45),
+                      blurRadius: 42,
+                      spreadRadius: 2.8,
+                      offset: const Offset(0, 0),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.18),
+                      blurRadius: 64,
+                      spreadRadius: 6.0,
+                      offset: const Offset(0, 0),
+                    ),
+                  ]
+                : outerShadows,
           ),
           child: Stack(
             children: [
@@ -442,7 +483,8 @@ class _SensorCardWithImageState extends State<SensorCardWithImage> {
                             ? Alignment.bottomRight
                             : Alignment.bottomLeft,
                         colors: [
-                          Colors.white.withOpacity(0.28),
+                          Colors.white.withOpacity(
+                              _isPressed ? 0.52 : (_isHovered ? 0.34 : 0.28)),
                           Colors.transparent,
                         ],
                       ),
@@ -480,15 +522,19 @@ class _SensorCardWithImageState extends State<SensorCardWithImage> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          accentColor.withOpacity(0.35),
+                          accentColor.withOpacity(_isPressed ? 0.55 : 0.35),
                           Colors.transparent,
                         ],
-                        stops: const [0.0, 0.25],
+                        stops: _isPressed
+                            ? const [0.0, 0.35]
+                            : const [0.0, 0.25],
                       ),
                     ),
                   ),
                 ),
               ),
+
+              
               // Eliminada sombra interna gris para evitar opacidad no deseada
               // Halo interno extra en hover para simular "energía activa"
               if (_isHovered)
@@ -509,7 +555,32 @@ class _SensorCardWithImageState extends State<SensorCardWithImage> {
                     ),
                   ),
                 ),
+
+              // Flash sutil al presionar (más brillo temporal sin cambiar paleta)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: AnimatedOpacity(
+                    opacity: _isPressed ? 0.28 : 0.0,
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: const RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.85,
+                          colors: [
+                            Color.fromARGB(255, 255, 255, 255),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
+          ),
           ),
         ),
       ),
