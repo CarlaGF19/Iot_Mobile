@@ -7,7 +7,7 @@ import '../widgets/bottom_navigation_widget.dart';
 
 class SensorDashboardScreen extends StatefulWidget {
   final String ip;
-  
+
   const SensorDashboardScreen({super.key, required this.ip});
 
   @override
@@ -90,12 +90,12 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: Color(0xFFE6FFF5),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         elevation: 2,
         title: const Text(
-          'Sensores',
+          'Dashboard de Sensores',
           style: TextStyle(
             color: Color(0xFF009E73),
             fontWeight: FontWeight.w600,
@@ -116,8 +116,8 @@ class _SensorDashboardScreenState extends State<SensorDashboardScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          // Ajuste de altura por tile para evitar overflow con contenido
-          childAspectRatio: 0.85,
+          // Ratio consistente y equilibrado del contenedor
+          childAspectRatio: 0.90,
           children: [
             SensorCardWithImage(
               titulo: "TEMPERATURA",
@@ -202,7 +202,7 @@ class SensorCard extends StatelessWidget {
   }
 }
 
-class SensorCardWithImage extends StatelessWidget {
+class SensorCardWithImage extends StatefulWidget {
   final String titulo;
   final String imagePath;
   final VoidCallback onTap;
@@ -215,52 +215,300 @@ class SensorCardWithImage extends StatelessWidget {
   });
 
   @override
+  State<SensorCardWithImage> createState() => _SensorCardWithImageState();
+}
+
+class _SensorCardWithImageState extends State<SensorCardWithImage> {
+  bool _isHovered = false;
+
+  // Paletas por sensor (Cristales Sensoriales)
+  List<Color> _gradientFor(String titulo) {
+    switch (titulo.toUpperCase()) {
+      case 'TEMPERATURA':
+        return const [Color(0xFFFFE29F), Color(0xFFFFA62E)];
+      case 'HUMEDAD':
+        return const [Color(0xFF89F7FE), Color(0xFF66A6FF)];
+      case 'PH':
+        return const [Color(0xFFA18CD1), Color(0xFFFBC2EB)];
+      case 'TDS':
+      case 'PPM':
+        return const [Color(0xFF2BC0E4), Color(0xFFEAECC6)];
+      default:
+        return const [Color(0xFF00E0A6), Color(0xFF00B894)]; // fallback mint
+    }
+  }
+
+  Color _accentFor(String titulo) {
+    switch (titulo.toUpperCase()) {
+      case 'TEMPERATURA':
+        return const Color(0xFFFFBE50);
+      case 'HUMEDAD':
+        return const Color(0xFF66A6FF);
+      case 'PH':
+        return const Color(0xFFF199FB);
+      case 'TDS':
+      case 'PPM':
+        return const Color(0xFF2BC0E4);
+      default:
+        return const Color(0xFF00E0A6);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFE6FFF5),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF009E73), width: 1),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromRGBO(0, 160, 120, 0.15),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
+    final Size size = MediaQuery.of(context).size;
+    final bool isWide = size.width >= 700; // tablet/desktop
+    // Base tipográfica como unidad relativa (em/rem aproximado)
+    final double baseEm = 14 * MediaQuery.of(context).textScaleFactor;
+    // Imagen proporcional al ancho de pantalla, con límites para consistencia
+    final double iconSize = (size.width * 0.18).clamp(96.0, isWide ? 132.0 : 120.0);
+    final List<Color> gradColors = _gradientFor(widget.titulo);
+    final Color baseColor = gradColors.first;
+    final Color accentColor = _accentFor(widget.titulo);
+    // Sombras exteriores con foco inferior y profundidad suave.
+    final List<BoxShadow> outerShadows = [
+      BoxShadow(
+        color: baseColor.withOpacity(0.28), // foco inferior ovalado tintado
+        blurRadius: 24,
+        offset: const Offset(0, 8),
+      ),
+      BoxShadow(
+        color: baseColor.withOpacity(0.16), // segunda sombra difusa
+        blurRadius: 12,
+        offset: const Offset(0, 4),
+      ),
+    ];
+    if (_isHovered) {
+      outerShadows.add(
+        BoxShadow(
+          color: accentColor.withOpacity(0.35), // halo tenue en hover
+          blurRadius: 16,
+          spreadRadius: 1,
+          offset: const Offset(0, 0),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      );
+    }
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+          constraints: const BoxConstraints(minHeight: 240),
+          decoration: BoxDecoration(
+            // Degradado metálico-luminoso premium
+            gradient: LinearGradient(
+              begin: _isHovered
+                  ? const Alignment(-0.75, -0.85)
+                  : const Alignment(-0.6, -0.7),
+              end: _isHovered
+                  ? const Alignment(0.95, 0.85)
+                  : const Alignment(0.9, 0.8),
+              colors: gradColors,
+              stops: gradColors.length == 3
+                  ? const [0.0, 0.5, 1.0]
+                  : const [0.0, 1.0],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withOpacity(_isHovered ? 0.85 : 0.75),
+              width: _isHovered ? 2.0 : 1.8,
+            ),
+            boxShadow: outerShadows,
+          ),
+          child: Stack(
             children: [
-              // Imagen dentro de la card (no superpuesta)
-              Image.asset(
-                imagePath,
-                width: 96,
-                height: 96,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.broken_image,
-                    color: Color(0xFF00E0A6),
-                    size: 96,
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              Text(
-                titulo,
-                style: const TextStyle(
-                  color: Color(0xFF009E73),
-                  fontWeight: FontWeight.bold,
+              // Contenido principal en columnas: imagen arriba, título y texto abajo
+              Padding(
+                // Padding proporcional al tamaño de fuente para mantener respiración visual
+                padding: EdgeInsets.symmetric(
+                  horizontal: baseEm * 1.2,
+                  vertical: baseEm * 1.0,
                 ),
-                textAlign: TextAlign.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Ícono arriba-izquierda con glow suave
+                    SizedBox(
+                      width: iconSize,
+                      height: iconSize,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Sombra circular suave bajo el ícono, tono del cristal
+                          Container(
+                            width: iconSize,
+                            height: iconSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: baseColor.withOpacity(0.22),
+                                  blurRadius: 24,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AnimatedScale(
+                            duration: const Duration(milliseconds: 160),
+                            scale: _isHovered ? 1.03 : 1.0,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: baseColor.withOpacity(0.18),
+                                    blurRadius: 16,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: Image.asset(
+                                widget.imagePath,
+                                width: iconSize,
+                                height: iconSize,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.broken_image,
+                                    color: baseColor,
+                                    size: iconSize,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Separación proporcional entre imagen y texto
+                    SizedBox(height: baseEm * 0.8),
+                    // Título y acción abajo
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Asegura ancho fijo y truncado seguro del título
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            widget.titulo,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              letterSpacing: 0.1,
+                              shadows: [
+                                Shadow(
+                                  color: accentColor.withOpacity(0.35),
+                                  blurRadius: 2.0,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(height: baseEm * 0.6),
+                        SensorActionInfo(
+                          label: 'Show Details',
+                          glowColor: accentColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              SensorActionInfo(label: 'Show Details'),
+
+              // Reflejo especular suave en diagonal (de arriba izq a abajo der)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: LinearGradient(
+                        begin: _isHovered
+                            ? Alignment.topLeft
+                            : Alignment.topRight,
+                        end: _isHovered
+                            ? Alignment.bottomRight
+                            : Alignment.bottomLeft,
+                        colors: [
+                          Colors.white.withOpacity(0.28),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Brillo radial en la esquina superior izquierda (20% 20%)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: RadialGradient(
+                        center: Alignment.topLeft,
+                        radius: 0.8,
+                        colors: [
+                          Colors.white.withOpacity(0.32),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Luz ambiental inferior simulando inset (brillo reflejado del sensor)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          accentColor.withOpacity(0.35),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.25],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Eliminada sombra interna gris para evitar opacidad no deseada
+              // Halo interno extra en hover para simular "energía activa"
+              if (_isHovered)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: RadialGradient(
+                          center: Alignment.center,
+                          radius: 1.0,
+                          colors: [
+                            accentColor.withOpacity(0.18),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -268,12 +516,17 @@ class SensorCardWithImage extends StatelessWidget {
     );
   }
 }
+
 // Botón reutilizable tipo "píldora" para el Sensor Dashboard
 class SensorActionButton extends StatefulWidget {
   final String label;
   final VoidCallback onTap;
 
-  const SensorActionButton({super.key, required this.label, required this.onTap});
+  const SensorActionButton({
+    super.key,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   State<SensorActionButton> createState() => _SensorActionButtonState();
@@ -320,34 +573,38 @@ class _SensorActionButtonState extends State<SensorActionButton> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Imagen pequeña dentro del botón
-              Image.asset(
-                'assets/icons/sensor_s.png',
-                width: 22,
-                height: 22,
-              ),
+              Image.asset('assets/icons/sensor_s.png', width: 22, height: 22),
               const SizedBox(width: 8),
               // Texto principal + mini texto
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.label,
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.label,
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Text(
-                    'detalles',
-                    style: TextStyle(
-                      color: const Color(0xFF009E73).withOpacity(0.85),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
+                    Text(
+                      'detalles',
+                      style: TextStyle(
+                        color: const Color(0xFF009E73).withOpacity(0.85),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -360,17 +617,29 @@ class _SensorActionButtonState extends State<SensorActionButton> {
 // Bloque informativo no interactivo (imagen + texto + mini texto)
 class SensorActionInfo extends StatelessWidget {
   final String label;
-  const SensorActionInfo({super.key, required this.label});
+  final Color? glowColor; // opcional: brillo acorde al color dominante
+  const SensorActionInfo({super.key, required this.label, this.glowColor});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(
-        color: Color(0xFF009E73),
-        fontWeight: FontWeight.w600,
-        fontSize: 12,
+      style: TextStyle(
+        color: Colors.white.withOpacity(0.70),
+        fontWeight: FontWeight.w700,
+        fontSize: 13,
+        shadows: [
+          Shadow(
+            color: (glowColor ?? const Color(0xFF00E0A6)).withOpacity(0.35),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
     );
   }
 }
