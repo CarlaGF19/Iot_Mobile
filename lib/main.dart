@@ -18,16 +18,10 @@ void main() {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/splash',
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const WelcomeScreen(),
-    ),
-    GoRoute(
-      path: '/splash',
-      builder: (context, state) => const SplashScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const WelcomeScreen()),
+    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/ip',
       builder: (context, state) => const DeviceConfigScreen(),
@@ -69,10 +63,7 @@ final GoRouter _router = GoRouter(
       path: '/device-connection',
       builder: (context, state) => const DeviceConnectionScreen(),
     ),
-    GoRoute(
-      path: '/about',
-      builder: (context, state) => const AboutScreen(),
-    ),
+    GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
     GoRoute(
       path: '/notifications',
       builder: (context, state) => const NotificationsScreen(),
